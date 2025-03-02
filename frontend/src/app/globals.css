@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-size: 16px;
+  padding: 0px !important;
+  overflow-x: hidden;
+  scroll-padding-top: 64px;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Pretendard Variable", Roboto, sans-serif;
+}
