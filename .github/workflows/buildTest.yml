@@ -1,0 +1,36 @@
+name: Vercel Build Test
+
+on:
+  pull_request:
+    branches:
+      - "dev"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Setup Vercel
+        run: npm i -g vercel
+
+      - name: update Vercel
+        run: npm i -g vercel@latest
+
+      - name: Pull Vercel
+        run: vercel pull --token ${{ secrets.VERCEL_TOKEN }} --yes
+
+      - name: Build Vercel
+        run: vercel build --token ${{ secrets.VERCEL_TOKEN }} --yes

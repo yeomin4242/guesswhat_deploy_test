@@ -1,0 +1,39 @@
+name: "수정 (fix)"
+description: 수정 Issue 작성 양식입니다.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        작성 예시 : "fix: 주소 검색 시, 검색 결과가 없을 때의 처리 방법 수정"
+  - type: textarea
+    id: fix-description
+    attributes:
+      label: 수정 내용
+      description: 어떠한 수정을 하시는 건지 적어주세요.
+      placeholder: 수정 내용을 설명해주세요. (ex. 주소 검색 시, 검색 결과가 없을 때의 처리 방법 수정)
+    validations:
+      required: true
+  - type: textarea
+    id: fix-detail
+    attributes:
+      label: 수정 방법
+      description: 수정하기 위한 방법이나 접근 방법을 적어주세요.
+      placeholder: 수정 및 접근 방법을 설명해주세요. (ex. 검색 결과가 없을 때, 사용자에게 알림창을 띄워주는 방식으로 수정)
+    validations:
+      required: false
+  - type: textarea
+    id: fix-proposer
+    attributes:
+      label: 수정 출처 / 발견자
+      description: 해당 수정이 어디서 나왔는지 (회의록), 또 누가 발견했는지 적어주세요.
+      placeholder: 수정사항이 건의된 곳 (회의록, N월 N일 테스트 등)과 발견자의 이름을 적어주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: fix-source
+    attributes:
+      label: 참고 자료
+      description: 수정하기 위해 참고한 / 참고할 자료가 있다면 적어주세요.
+      placeholder: 참고한 자료가 있다면 적어주세요.
+    validations:
+      required: false

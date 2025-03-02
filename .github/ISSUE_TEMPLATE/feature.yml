@@ -1,0 +1,51 @@
+name: "기능 추가 (feat)"
+description: 기능 추가 Issue 작성 양식입니다.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        작성 예시 : "feat: 컴포넌트 필터링 추가"
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: 기능 설명
+      description: 어떠한 기능을 추가하시는 건지 적어주세요.
+      placeholder: 기능을 설명해주세요. (ex. 사이트에 맞춰 주소를 필드별로 구분해 표시하는 기능 추가)
+    validations:
+      required: true
+  - type: textarea
+    id: feature-detail
+    attributes:
+      label: 구현 / 접근 방법
+      description: 기능을 구현하기 위한 방법이나 접근 방법을 적어주세요.
+      placeholder: 구현 및 접근 방법을 설명해주세요. (ex. 사이트에서 주소를 요구하는 방식 - Street, City, State, Zip Code - 에 맞춰 주소를 필드별로 구분해 표시)
+    validations:
+      required: true
+  - type: textarea
+    id: feature-proposer
+    attributes:
+      label: 기능 출처 / 제안자
+      description: 해당 기능이 어디서 나왔는지 (회의록), 또 누가 제안했는지 적어주세요.
+      value: |
+        #### 출처
+        - N월 N일 회의록
+        #### 제안자
+        - 이름
+    validations:
+      required: true
+  - type: textarea
+    id: feature-reference
+    attributes:
+      label: 참고 자료
+      description: 기능을 구현하기 위해 참고한 자료가 있다면 적어주세요.
+      placeholder: 참고한 자료가 있다면 적어주세요.
+    validations:
+      required: false
+  - type: textarea
+    id: feature-source
+    attributes:
+      label: 부모 이슈
+      description: 부모 (엄브렐라) 이슈가 있다면 적어주세요.
+      placeholder: 부모 이슈가 있다면 적어주세요.
+    validations:
+      required: false
