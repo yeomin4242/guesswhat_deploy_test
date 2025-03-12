@@ -1,6 +1,6 @@
 import Script from "next/script";
 
-const GoogleAdsense = () => {
+const FoldableHorizontalAdsense = () => {
   if (process.env.NODE_ENV !== "production") {
     return null;
   }
@@ -15,4 +15,4 @@ const GoogleAdsense = () => {
   );
 };
 
-export default GoogleAdsense;
+export default FoldableHorizontalAdsense;
