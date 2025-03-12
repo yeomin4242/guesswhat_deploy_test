@@ -1,75 +1,142 @@
-import Script from "next/script";
-import { useEffect, useState } from "react";
+"use client";
 
-const FoldableHorizontalAdsense: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(true);
-  const [adsLoaded, setAdsLoaded] = useState(false);
+import { useEffect, useRef, useState } from "react";
 
-  const adClient = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT || "";
-  const adSlot = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_HORIZON_SLOT || "";
+interface VerticalAdSenseProps {
+  responsive?: boolean;
+  position?: "left" | "right";
+}
 
+const VerticalAdSense: React.FC<VerticalAdSenseProps> = ({
+  responsive = true,
+  position = "left",
+}) => {
+  const adRef = useRef<HTMLModElement | null>(null);
+  const [isAdLoaded, setIsAdLoaded] = useState(false);
+  // 이미 push가 호출되었는지 추적하는 ref
+  const hasPushedRef = useRef(false);
+  // 창 너비가 1536px(2xl) 이상인지 추적하는 상태
+  const [isLarge, setIsLarge] = useState(false);
+
+  // 창 resize 이벤트로 isLarge 상태 업데이트
   useEffect(() => {
-    // window.adsbygoogle가 존재하고 광고 스크립트가 로드된 경우에만 광고 푸시
-    if (window.adsbygoogle && adsLoaded) {
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-        console.log("Ad push attempted");
-      } catch (error) {
-        console.error("Error pushing ad:", error);
-      }
+    const updateSize = () => {
+      setIsLarge(window.innerWidth >= 1536);
+    };
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  // 창이 2xl 미만이면 상태를 초기화하여 재렌더링 시 광고를 다시 로드하도록 함
+  useEffect(() => {
+    if (!isLarge) {
+      hasPushedRef.current = false;
+      setIsAdLoaded(false);
     }
-  }, [adsLoaded]);
+  }, [isLarge]);
 
-  // 광고가 보이지 않을 때는 컴포넌트를 렌더링하지 않음
-  if (!isVisible) return null;
+  // 뷰포트가 2xl 이상일 때만 광고 로드
+  useEffect(() => {
+    if (!isLarge) return;
+    if (typeof window === "undefined") return;
 
-  // 환경 변수 확인을 위한 로그
-  console.log("Ad Client:", adClient);
-  console.log("Ad Slot:", adSlot);
+    // Google AdSense 스크립트를 한 번만 로드
+    if (!document.querySelector("#adsbygoogle-init")) {
+      const script = document.createElement("script");
+      script.id = "adsbygoogle-init";
+      script.src =
+        "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      document.head.appendChild(script);
+    }
+
+    const loadAd = () => {
+      if (!adRef.current) return;
+      if (hasPushedRef.current) return; // 이미 push된 경우 건너뜀
+
+      // 이미 로드된 경우
+      if (adRef.current.getAttribute("data-ad-status") === "done") {
+        hasPushedRef.current = true;
+        setIsAdLoaded(true);
+        return;
+      }
+
+      // 컨테이너 너비가 0이면 재시도
+      if (adRef.current.offsetWidth <= 0) {
+        setTimeout(loadAd, 1000);
+        return;
+      }
+
+      try {
+        (window as any).adsbygoogle = (window as any).adsbygoogle || [];
+        (window as any).adsbygoogle.push({});
+        hasPushedRef.current = true;
+        setIsAdLoaded(true);
+      } catch (err) {
+        console.error("AdSense error:", err);
+      }
+    };
+
+    // ResizeObserver로 광고 컨테이너 크기 변화를 감지하여 광고 로드
+    const observer = new ResizeObserver(() => {
+      if (
+        adRef.current &&
+        adRef.current.offsetWidth > 0 &&
+        !hasPushedRef.current
+      ) {
+        loadAd();
+      }
+    });
+    if (adRef.current) {
+      observer.observe(adRef.current);
+    }
+
+    // 창 리사이즈 이벤트 (2xl 이상이면 재호출)
+    const handleResize = () => {
+      if (
+        window.innerWidth >= 1536 &&
+        adRef.current &&
+        adRef.current.offsetWidth > 0 &&
+        !hasPushedRef.current
+      ) {
+        loadAd();
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    const timer = setTimeout(loadAd, 1500);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timer);
+    };
+  }, [responsive, position, isLarge]);
+
+  if (!isLarge) return null;
 
   return (
-    <>
-      <Script
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adClient}`}
-        strategy="afterInteractive"
-        onLoad={() => {
-          console.log("AdSense script loaded");
-          setAdsLoaded(true);
+    <div
+      className={`fixed top-[55%] w-[160px] -translate-y-1/2 ${
+        position === "left" ? "left-4" : "right-4"
+      }`}
+    >
+      <ins
+        ref={adRef}
+        className="adsbygoogle"
+        style={{
+          display: "block",
+          width: "160px",
+          height: "600px",
         }}
-        onError={(e) => {
-          console.error("AdSense script error:", e);
-        }}
+        data-ad-client={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT}
+        data-ad-slot={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_VERTICAL_SLOT}
+        data-ad-format="vertical"
+        data-full-width-responsive={responsive ? "true" : "false"}
       />
-
-      <div className="fixed bottom-0 left-0 z-50 w-full bg-white shadow-md">
-        <div className="relative flex items-center justify-center">
-          <div className="mx-auto w-full">
-            {adClient && adSlot && (
-              <ins
-                className="adsbygoogle"
-                style={{
-                  display: "block",
-                  width: "100%",
-                  height: "90px",
-                  minHeight: "50px",
-                }}
-                data-ad-client={adClient}
-                data-ad-slot={adSlot}
-                data-ad-format="auto"
-                data-full-width-responsive="true"
-              />
-            )}
-          </div>
-          <button
-            className="absolute right-4 top-1 rounded-md bg-gray-700 px-3 py-1 text-sm text-white hover:bg-gray-900"
-            onClick={() => setIsVisible(false)}
-          >
-            ✖ Close
-          </button>
-        </div>
-      </div>
-    </>
+    </div>
   );
 };
 
-export default FoldableHorizontalAdsense;
+export default VerticalAdSense;

@@ -2,6 +2,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { NextUIProvider } from "@nextui-org/system";
 import type { Metadata } from "next";
 import { CookiesProvider } from "next-client-cookies/server";
+import Script from "next/script";
 import NavBar from "@/components/navbar";
 import "@/fonts/pretendardvariable.css";
 import NextThemesProvider from "@/providers/next-themes-provider";
@@ -45,6 +46,12 @@ export default function RootLayout({
           <NextThemesProvider>
             <CookiesProvider>
               <NavBar />
+              <Script
+                async
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7219773941395265"
+                crossOrigin="anonymous"
+                strategy="beforeInteractive"
+              />
               {children}
             </CookiesProvider>
           </NextThemesProvider>
